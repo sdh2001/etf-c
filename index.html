@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,8 +12,10 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;700&display=swap');
 
         :root {
-            --up-color: #ef4444; /* China market Red for Up */
-            --down-color: #22c55e; /* China market Green for Down */
+            --up-color: #ef4444;
+            /* China market Red for Up */
+            --down-color: #22c55e;
+            /* China market Green for Down */
             --font-main: 'Inter', sans-serif;
             --font-title: 'Outfit', sans-serif;
         }
@@ -38,27 +41,56 @@
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
         }
 
-        .up-text { color: var(--up-color); }
-        .down-text { color: var(--down-color); }
+        .up-text {
+            color: var(--up-color);
+        }
 
-        .up-bg { background-color: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); }
-        .down-bg { background-color: rgba(34, 197, 94, 0.1); border-color: rgba(34, 197, 94, 0.2); }
+        .down-text {
+            color: var(--down-color);
+        }
+
+        .up-bg {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .down-bg {
+            background-color: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.2);
+        }
 
         /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
 
         .shimmer {
-            background: linear-gradient(90deg, rgba(30,41,59,0) 0%, rgba(51,65,85,1) 50%, rgba(30,41,59,0) 100%);
+            background: linear-gradient(90deg, rgba(30, 41, 59, 0) 0%, rgba(51, 65, 85, 1) 50%, rgba(30, 41, 59, 0) 100%);
             background-size: 200% 100%;
             animation: shimmer 1.5s infinite;
         }
 
         @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
+            0% {
+                background-position: -200% 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
         }
 
         .loading-skeleton {
@@ -90,6 +122,7 @@
         }
     </style>
 </head>
+
 <body class="min-h-screen">
     <!-- Header -->
     <header class="sticky top-0 z-50 py-4 px-6 mb-8 border-b border-white/5 bg-[#0f172a]/80 backdrop-blur-lg">
@@ -104,7 +137,8 @@
                 </div>
             </div>
             <div class="flex items-center gap-4">
-                <div id="market-status" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/50 border border-slate-700">
+                <div id="market-status"
+                    class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/50 border border-slate-700">
                     <span class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></span>
                     <span class="text-xs font-medium text-slate-300">市场状态更新中...</span>
                 </div>
@@ -169,9 +203,12 @@
         </div>
 
         <!-- Detail Modal (Hidden by default) -->
-        <div id="modal-overlay" class="fixed inset-0 z-[60] bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
-            <div class="bg-[#1e293b] w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl border border-white/10 p-6 relative">
-                <button id="close-modal" class="absolute top-4 right-4 p-2 hover:bg-slate-700 rounded-full transition-colors">
+        <div id="modal-overlay"
+            class="fixed inset-0 z-[60] bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+            <div
+                class="bg-[#1e293b] w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl border border-white/10 p-6 relative">
+                <button id="close-modal"
+                    class="absolute top-4 right-4 p-2 hover:bg-slate-700 rounded-full transition-colors">
                     <i data-lucide="x" class="w-6 h-6"></i>
                 </button>
                 <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
@@ -245,10 +282,12 @@
 
         // Main App Logic
         async function fetchMarketData() {
-            const codes = ETFS.map(e => e.code).join(',');
+            // Fix: Map each code with 's_' prefix to get summary data for all ETFs
+            const codes = ETFS.map(e => 's_' + e.code).join(',');
             const proxyUrl = 'https://api.allorigins.win/raw?url=';
-            const apiUrl = encodeURIComponent(`http://qt.gtimg.cn/q=s_sh000300,s_sh000905,s_sh000016,s_sz399006,s_${codes}`);
-            
+            // Removed the extra 's_' at the end of the indexes list
+            const apiUrl = encodeURIComponent(`http://qt.gtimg.cn/q=s_sh000300,s_sh000905,s_sh000016,s_sz399006,${codes}`);
+
             try {
                 const response = await fetch(`${proxyUrl}${apiUrl}`);
                 const data = await response.text();
@@ -263,7 +302,7 @@
         function parseAndRender(raw) {
             const lines = raw.split(';').filter(l => l.trim().length > 0);
             const dataMap = {};
-            
+
             lines.forEach(line => {
                 const match = line.match(/v_s_(.+?)="(.+?)"/);
                 if (match) {
@@ -304,15 +343,15 @@
         };
 
         function renderGrid(dataMap) {
-            const filtered = currentFilter === 'all' 
-                ? ETFS 
+            const filtered = currentFilter === 'all'
+                ? ETFS
                 : ETFS.filter(e => e.category === currentFilter);
-            
+
             etfGrid.innerHTML = filtered.map(etf => {
                 const data = dataMap[etf.code] || { price: '--.--', changePct: '0.00' };
                 const pct = parseFloat(data.changePct);
                 const isUp = pct >= 0;
-                
+
                 return `
                     <div class="glass-card p-6 flex flex-col cursor-pointer transform hover:scale-[1.02] active:scale-95" onclick="showDetail('${etf.code}')">
                         <div class="flex justify-between items-start mb-4">
@@ -336,7 +375,7 @@
                     </div>
                 `;
             }).join('');
-            
+
             // Re-create icons & sparklines
             lucide.createIcons();
             filtered.forEach(etf => renderSparkline(`spark-${etf.code}`, dataMap[etf.code]?.changePct >= 0));
@@ -346,11 +385,11 @@
             const el = document.getElementById(id);
             if (!el) return;
             const chart = echarts.init(el);
-            
+
             // Generate mock trend for sparkline (Real-time history is hard to fetch in bulk)
             const count = 10;
-            const trend = Array.from({length: count}, (_, i) => Math.sin(i * 0.5) + Math.random() * 0.5 + (isUp ? i * 0.1 : -i * 0.1));
-            
+            const trend = Array.from({ length: count }, (_, i) => Math.sin(i * 0.5) + Math.random() * 0.5 + (isUp ? i * 0.1 : -i * 0.1));
+
             const option = {
                 ...sparklineOptions,
                 series: [{
@@ -368,14 +407,14 @@
             const priceEl = document.getElementById(`${id.replace('idx', 'idx-price')}`);
             const changeEl = document.getElementById(`${id.replace('idx', 'idx-change')}`);
             const sparkEl = document.getElementById(`${id.replace('idx', 'spark')}`);
-            
+
             priceEl.innerText = data.price;
             const pct = parseFloat(data.changePct);
             changeEl.innerText = `${pct > 0 ? '+' : ''}${data.changePct}%`;
-            
+
             priceEl.className = `text-2xl font-bold ${pct >= 0 ? 'up-text' : 'down-text'}`;
             changeEl.className = `text-sm font-medium mb-1 ${pct >= 0 ? 'up-text' : 'down-text'}`;
-            
+
             if (sparkEl) renderSparkline(sparkEl.id, pct >= 0);
         }
 
@@ -385,13 +424,13 @@
             const hour = now.getHours();
             const min = now.getMinutes();
             const day = now.getDay();
-            
+
             const isWeekend = day === 0 || day === 6;
             const isTradingTime = !isWeekend && (
-                 (hour === 9 && min >= 30) || 
-                 (hour > 9 && hour < 11) ||
-                 (hour === 11 && min <= 30) ||
-                 (hour >= 13 && hour < 15)
+                (hour === 9 && min >= 30) ||
+                (hour > 9 && hour < 11) ||
+                (hour === 11 && min <= 30) ||
+                (hour >= 13 && hour < 15)
             );
 
             if (isTradingTime) {
@@ -408,17 +447,17 @@
         }
 
         // Detail View
-        window.showDetail = async function(code) {
+        window.showDetail = async function (code) {
             const etf = ETFS.find(e => e.code === code);
             document.getElementById('detail-name').innerText = etf.name;
             document.getElementById('detail-code').innerText = code.toUpperCase();
             document.getElementById('detail-desc').innerText = etf.desc;
-            
+
             modal.classList.remove('opacity-0', 'pointer-events-none');
-            
+
             // Show loading
             document.getElementById('detail-chart').innerHTML = '<div class="h-full flex items-center justify-center text-slate-500">图表数据加载中...</div>';
-            
+
             await fetchDetailData(code);
         }
 
@@ -426,12 +465,12 @@
             const proxyUrl = 'https://api.allorigins.win/raw?url=';
             // Use Tencent full API for details
             const apiUrl = encodeURIComponent(`http://qt.gtimg.cn/q=${code}`);
-            
+
             try {
                 const response = await fetch(`${proxyUrl}${apiUrl}`);
                 const raw = await response.text();
                 const values = raw.match(/="(.+?)"/)[1].split('~');
-                
+
                 // Detailed data parsing
                 const data = {
                     price: values[3],
@@ -463,17 +502,17 @@
             const chartDom = document.getElementById('detail-chart');
             if (detailChart) detailChart.dispose();
             detailChart = echarts.init(chartDom, 'dark');
-            
+
             // Mocking historical data for demonstration since full history API is complex to proxy
             // In a real app, I'd fetch http://img1.money.126.net/data/hs/kline/day/history/2026/0510300.json
             const basePrice = 3.5;
-            const dates = Array.from({length: 60}, (_, i) => {
+            const dates = Array.from({ length: 60 }, (_, i) => {
                 const d = new Date();
                 d.setDate(d.getDate() - (60 - i));
                 return d.toISOString().split('T')[0];
             });
-            
-            const data = Array.from({length: 60}, (_, i) => {
+
+            const data = Array.from({ length: 60 }, (_, i) => {
                 const open = basePrice + Math.random() * 0.4 - 0.2;
                 const close = open + Math.random() * 0.2 - 0.1;
                 const low = Math.min(open, close) - Math.random() * 0.05;
@@ -532,4 +571,5 @@
         });
     </script>
 </body>
+
 </html>
