@@ -301,22 +301,41 @@
         const modal = document.getElementById('modal-overlay');
         const closeModal = document.getElementById('close-modal');
 
-        // Main App Logic
+        // Main App Logic with Multi-Proxy Fallback
         async function fetchMarketData() {
-            // Fix: Map each code with 's_' prefix to get summary data for all ETFs
             const codes = ETFS.map(e => 's_' + e.code).join(',');
-            const proxyUrl = 'https://api.allorigins.win/raw?url=';
-            // Removed the extra 's_' at the end of the indexes list
-            const apiUrl = encodeURIComponent(`http://qt.gtimg.cn/q=s_sh000300,s_sh000905,s_sh000016,s_sz399006,${codes}`);
+            const target = `http://qt.gtimg.cn/q=s_sh000300,s_sh000905,s_sh000016,s_sz399006,${codes}`;
+            
+            const proxies = [
+                url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+                url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+                url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
+            ];
 
-            try {
-                const response = await fetch(`${proxyUrl}${apiUrl}`);
-                const data = await response.text();
-                parseAndRender(data);
-                lastUpdateSpan.innerText = new Date().toLocaleTimeString();
-                updateMarketStatus();
-            } catch (error) {
-                console.error('Fetch error:', error);
+            let success = false;
+            for (const getProxyUrl of proxies) {
+                try {
+                    const response = await fetch(getProxyUrl(target), { cache: 'no-store' });
+                    if (!response.ok) throw new Error('Proxy status: ' + response.status);
+                    const data = await response.text();
+                    if (data && data.includes('v_s_')) {
+                        parseAndRender(data);
+                        lastUpdateSpan.innerText = new Date().toLocaleTimeString();
+                        updateMarketStatus();
+                        success = true;
+                        console.log('Successfully fetched market data.');
+                        break;
+                    }
+                } catch (err) {
+                    console.warn('Proxy failed, trying next...', err.message);
+                }
+            }
+
+            if (!success) {
+                document.getElementById('market-status').innerHTML = `
+                    <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                    <span class="text-xs font-medium text-red-400">网络连接异常</span>
+                `;
             }
         }
 
@@ -483,39 +502,52 @@
         }
 
         async function fetchDetailData(code) {
-            const proxyUrl = 'https://api.allorigins.win/raw?url=';
-            // Use Tencent full API for details
-            const apiUrl = encodeURIComponent(`http://qt.gtimg.cn/q=${code}`);
+            const target = `http://qt.gtimg.cn/q=${code}`;
+            const proxies = [
+                url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+                url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+                url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
+            ];
 
-            try {
-                const response = await fetch(`${proxyUrl}${apiUrl}`);
-                const raw = await response.text();
-                const values = raw.match(/="(.+?)"/)[1].split('~');
+            let success = false;
+            for (const getProxyUrl of proxies) {
+                try {
+                    const response = await fetch(getProxyUrl(target));
+                    if (!response.ok) throw new Error('Status ' + response.status);
+                    const raw = await response.text();
+                    const match = raw.match(/="(.+?)"/);
+                    if (!match) continue;
 
-                // Detailed data parsing
-                const data = {
-                    price: values[3],
-                    change: values[31],
-                    changePct: values[32],
-                    open: values[5],
-                    high: values[33],
-                    low: values[34],
-                    volume: (parseFloat(values[37]) / 10000).toFixed(2), // 亿
-                    isUp: parseFloat(values[32]) >= 0
-                };
+                    const values = match[1].split('~');
+                    const data = {
+                        price: values[3],
+                        change: values[31],
+                        changePct: values[32],
+                        open: values[5],
+                        high: values[33],
+                        low: values[34],
+                        volume: (parseFloat(values[37]) / 10000).toFixed(2),
+                        isUp: parseFloat(values[32]) >= 0
+                    };
 
-                document.getElementById('detail-price').innerText = data.price;
-                document.getElementById('detail-price').className = `text-4xl font-bold ${data.isUp ? 'up-text' : 'down-text'}`;
-                document.getElementById('detail-change').innerText = `${data.change} (${data.changePct}%)`;
-                document.getElementById('detail-change').className = `text-lg font-medium ${data.isUp ? 'up-text' : 'down-text'}`;
-                document.getElementById('detail-open').innerText = data.open;
-                document.getElementById('detail-high').innerText = data.high;
-                document.getElementById('detail-low').innerText = data.low;
-                document.getElementById('detail-volume').innerText = data.volume;
+                    document.getElementById('detail-price').innerText = data.price;
+                    document.getElementById('detail-price').className = `text-4xl font-bold ${data.isUp ? 'up-text' : 'down-text'}`;
+                    document.getElementById('detail-change').innerText = `${data.change} (${data.changePct}%)`;
+                    document.getElementById('detail-change').className = `text-lg font-medium ${data.isUp ? 'up-text' : 'down-text'}`;
+                    document.getElementById('detail-open').innerText = data.open;
+                    document.getElementById('detail-high').innerText = data.high;
+                    document.getElementById('detail-low').innerText = data.low;
+                    document.getElementById('detail-volume').innerText = data.volume;
 
-                renderLargeChart(code);
-            } catch (err) {
-                console.error(err);
+                    renderLargeChart(code);
+                    success = true;
+                    break;
+                } catch (err) {
+                    console.warn('Detail proxy failed:', err.message);
+                }
+            }
+            if (!success) {
+                document.getElementById('detail-chart').innerHTML = '<div class="h-full flex items-center justify-center text-red-400">详情加载失败，请重试</div>';
             }
         }
 
