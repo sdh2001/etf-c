@@ -191,10 +191,12 @@
             <div class="category-btn active" data-category="all">全部</div>
             <div class="category-btn" data-category="broad">宽基指数</div>
             <div class="category-btn" data-category="tech">硬科技/芯片</div>
+            <div class="category-btn" data-category="ai">人工智能/云</div>
+            <div class="category-btn" data-category="space">航空航天</div>
             <div class="category-btn" data-category="consumer">大消费</div>
             <div class="category-btn" data-category="health">医药医疗</div>
             <div class="category-btn" data-category="finance">大金融</div>
-            <div class="category-btn" data-category="energy">新能源</div>
+            <div class="category-btn" data-category="energy">能源动力</div>
         </div>
 
         <!-- ETF Grid -->
@@ -250,22 +252,41 @@
     <script>
         // Data & Config
         const ETFS = [
+            // 宽基指数
             { code: 'sh510300', name: '沪深300ETF', category: 'broad', desc: '跟踪沪深300指数，覆盖两市核心资产' },
             { code: 'sz159915', name: '创业板ETF', category: 'broad', desc: '跟踪创业板指数，聚焦成长性龙头' },
             { code: 'sh510050', name: '上证50ETF', category: 'broad', desc: '代表上海市场核心蓝筹股' },
             { code: 'sh510500', name: '中证500ETF', category: 'broad', desc: '中盘成长股代表，资产分布均衡' },
+            { code: 'sz159949', name: '创业板50ETF', category: 'broad', desc: '更具弹性的创业板中军核心标的' },
+            
+            // 人工智能/科技
             { code: 'sh512760', name: '芯片ETF', category: 'tech', desc: '涵盖深沪两市芯片行业主要龙头' },
+            { code: 'sh512930', name: '人工智能ETF', category: 'ai', desc: '算力、算法、大数据全产业链覆盖' },
+            { code: 'sz159819', name: '云计算ETF', category: 'ai', desc: '云服务、数据中心与网络安全龙头' },
+            { code: 'sh515070', name: 'AI智能ETF', category: 'ai', desc: '人工智能核心技术及下游应用' },
             { code: 'sh515050', name: '5G通信ETF', category: 'tech', desc: '聚焦5G设备、终端及下游应用' },
             { code: 'sz159939', name: '信息技术ETF', category: 'tech', desc: '全方位的IT、软件、互联网敞口' },
+            { code: 'sh512660', name: '军工ETF', category: 'tech', desc: '高端国防装备与自主可控龙头' },
+
+            // 航空航天
+            { code: 'sz159241', name: '航空航天ETF', category: 'space', desc: '聚焦空天装备与商业航天核心标的' },
+            { code: 'sz159227', name: '航天航空行业ETF', category: 'space', desc: '全方位的空天装备资产代表' },
+            
+            // 大消费/健康
             { code: 'sh510150', name: '上证消费ETF', category: 'consumer', desc: '上海市场主要消费品牌整合' },
             { code: 'sz159928', name: '消费ETF', category: 'consumer', desc: '跨市场消费龙头，含白酒龙头' },
             { code: 'sh512170', name: '医疗ETF', category: 'health', desc: '覆盖医疗器械、创新药服务' },
             { code: 'sh512010', name: '医药ETF', category: 'health', desc: '核心医药制造及研发外包' },
+            
+            // 全能能源
+            { code: 'sh516160', name: '新能源ETF', category: 'energy', desc: '光伏、风电等清洁能源标杆' },
+            { code: 'sh515030', name: '新能源车ETF', category: 'energy', desc: '锂电、整车及中游材料产业链' },
+            { code: 'sz159930', name: '能源ETF', category: 'energy', desc: '煤炭、石油、天然气等传统巨头' },
+            { code: 'sh510030', name: '能源行业ETF', category: 'energy', desc: '上证能源行业优势龙头企业' },
+
+            // 大金融
             { code: 'sh510230', name: '金融行业ETF', category: 'finance', desc: '银行、券商及综合性金融' },
-            { code: 'sh512000', name: '券商ETF', category: 'finance', desc: '深度复现大盘成交热度的风向标' },
-            { code: 'sh515030', name: '新能源车ETF', category: 'energy', desc: '涵盖锂电、整车及中游材料' },
-            { code: 'sh516160', name: '新能源ETF', category: 'energy', desc: '光伏、风电等清洁能源龙头' },
-            { code: 'sh512660', name: '军工ETF', category: 'tech', desc: '高端国防装备与自主可控' }
+            { code: 'sh512000', name: '券商ETF', category: 'finance', desc: '深度复现大盘成交热度的风向标' }
         ];
 
         let currentFilter = 'all';
